@@ -1,0 +1,244 @@
+---
+title: "Applied Multivariate Statistical Analysis"
+subtitle: "Exercise 1"
+author: "Kasper Veje Jakobsen (<kasja20@student.sdu.dk>)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: false
+    code_folding: show
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installing the st514 Package
+
+The first step is to install the required package for the course. This package contains datasets from the textbook and useful functions.
+
+```{r install-package, eval=FALSE}
+# Install the st514 package from the provided URL
+# install.packages("https://imada.sdu.dk/u/chdj/ST514/F20/st514_1.0.tar.gz", 
+#                  repos = NULL, type = "source")
+
+# Load the package
+library(st514)
+```
+
+Note: You only need to install the package once, but you will need to load it with `library(st514)` in each new R session.
+
+# Exercise 1: Working with Matrices in R
+
+## 1.1 Create the 4×3 matrix
+
+```{r matrix-creation}
+# Create the specified 4×3 matrix
+X <- matrix(c(1, 2, 3, 4, 2, 4, 5, 7, 3, 6, 7, 8), nrow = 4, ncol = 3, byrow = FALSE)
+
+# Display the matrix
+X
+```
+
+## 1.2 Compute the transpose
+
+```{r matrix-transpose}
+# Compute the transpose of X
+X_t <- t(X)
+
+# Display the transpose
+X_t
+```
+
+## 1.3 Compute the matrix product
+
+```{r matrix-product}
+# Compute X × X_t (matrix multiplication)
+X_prod <- X %*% X_t
+
+# Display the resulting matrix
+X_prod
+```
+
+## 1.4 Create an invertible matrix and compute its inverse
+
+```{r matrix-inverse}
+# Create the invertible matrix Y
+Y <- matrix(c(2, 1, 1, 2), nrow = 2, ncol = 2, byrow = TRUE)
+
+# Display Y
+Y
+
+# Compute the inverse of Y
+Y_inv <- solve(Y)
+
+# Display the inverse
+Y_inv
+
+# Verify that Y × Y_inv = I (identity matrix)
+Y %*% Y_inv
+```
+
+# Exercise 2: Column-Wise Operations
+
+## 2.1 Compute column means
+
+```{r column-means}
+# Compute the mean of each column of X
+col_means <- colMeans(X)
+
+# Display the column means
+col_means
+```
+
+## 2.2 Standardize the matrix
+
+```{r standardize-matrix}
+X
+# Standardize X (subtract mean and divide by standard deviation for each column)
+X_scaled <- scale(X)
+
+# Display the standardized matrix
+X_scaled
+
+# What does scale actually do?
+
+# Compute column means and column sd
+X_mean <- colMeans(X)
+x_std <- c(sd(X[, 1]), sd(X[, 2]), sd(X[, 3]))
+
+# Initialize a matrix to store the standardized values
+X_scaled_manual <- matrix(NA, nrow = 4, ncol = 3)
+
+# Fill in the standardized values manually
+X_scaled_manual[, 1] <- (X[, 1] - X_mean[1]) / x_std[1]
+X_scaled_manual[, 2] <- (X[, 2] - X_mean[2]) / x_std[2]
+X_scaled_manual[, 3] <- (X[, 3] - X_mean[3]) / x_std[3]
+
+# Show result
+X_scaled_manual
+```
+
+## 2.3 Verify standardization
+
+```{r verify-standardization}
+# Verify that column means are approximately 0
+colMeans(X_scaled)
+
+# Verify that column standard deviations are approximately 1
+# Using apply to calculate the standard deviation of each column
+apply(X_scaled, 2, sd)
+```
+
+# Exercise 3: Covariance and Correlation
+
+## 3.1 Compute the covariance matrix
+
+```{r covariance-matrix}
+# Compute the covariance matrix of X
+cov_matrix <- cov(X)
+
+# Display the covariance matrix
+cov_matrix
+```
+
+## 3.2 Compute the correlation matrix
+
+```{r correlation-matrix}
+# Compute the correlation matrix of X
+cor_matrix <- cor(X)
+
+# Display the correlation matrix
+cor_matrix
+```
+
+## 3.3 Difference between covariance and correlation
+
+The difference between covariance and correlation:
+
+1. **Covariance** measures how two variables change together, but its value depends on the scale of the variables.
+2. **Correlation** normalizes the covariance by dividing by the product of the standard deviations, resulting in a value between -1 and 1.
+
+Based on the computed matrices:
+- The covariance matrix elements can be any real number and depend on the scales of the variables.
+- The correlation matrix elements are always between -1 and 1, with the diagonal elements being exactly 1.
+
+The correlation values differ from the covariance values because they are standardized. This standardization allows for comparing the strength of relationships between different pairs of variables regardless of their scales.
+
+# Exercise 4: Eigenvalues and Eigenvectors
+
+## 4.1 Compute eigenvalues and eigenvectors
+
+```{r eigenvalues-eigenvectors}
+# Compute the eigenvalues and eigenvectors of the covariance matrix of X
+eig <- eigen(cov_matrix)
+
+# Display the eigenvalues
+eig$values
+
+# Display the eigenvectors
+eig$vectors
+```
+
+## 4.2 Verify the decomposition
+
+```{r verify-decomposition}
+# Create a diagonal matrix D of eigenvalues
+D <- diag(eig$values)
+
+# Extract eigenvector matrix V
+V <- eig$vectors
+
+# Verify the decomposition: V %*% D %*% solve(V) should equal cov_matrix
+decomp_verification <- V %*% D %*% solve(V)
+
+# Display the result of the verification
+decomp_verification
+
+# Check if the original covariance matrix and the decomposition result are approximately equal
+all.equal(cov_matrix, decomp_verification)
+```
+
+# Exercise 5: Visualizing Relationships Between Variables
+
+## 5.1 Generate random data
+
+```{r generate-data}
+# Set seed for reproducibility
+set.seed(123)
+
+# Generate a 50×3 matrix with standard normal values
+data <- matrix(rnorm(50*3), nrow = 50, ncol = 3)
+
+# Assign column names
+colnames(data) <- c("X1", "X2", "X3")
+
+# Display the first few rows of the data
+head(data)
+```
+
+## 5.2 Create a scatterplot matrix
+
+```{r scatterplot-matrix}
+# Create a scatterplot matrix
+pairs(data, main = "Scatterplot Matrix of Random Variables")
+```
+
+## 5.3 Relationship assessment
+
+Based on the scatterplot matrix:
+
+The scatterplots show no clear pattern or strong relationship between any pair of variables. This is expected because we generated the data from a standard normal distribution with independent variables. The points appear randomly scattered, which indicates little to no linear relationship between the variables.
+
+If we were to compute the correlation matrix for this data, we would expect values close to 0:
+
+```{r random-data-correlation}
+# Compute and display the correlation matrix for the randomly generated data
+cor(data)
+```
+
+As expected, the off-diagonal elements are close to 0, confirming the lack of strong relationships between the variables.
