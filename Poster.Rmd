@@ -26,6 +26,28 @@ levels(T6.19$Gender) <- c("Female", "Male")
 T6.19
 
 ```
+
+
+
+
+
+
+
+
+## Explanatory Data Analysis
+```{r}
+# Dimensioner
+dim(T6.19)
+```
+```{r}
+#Variabeltyper
+str(T6.19)
+```
+```{r}
+#Sammendrag
+summary(T6.19)
+```
+
 ```{r}
 # Check if the data is normally distributed
 qqnorm(T6.19$`Snout Vent Length (cm)`, 
@@ -48,26 +70,6 @@ qqnorm(T6.19$`Weight (kg)`,
 qqline(T6.19$`Weight (kg)`, col = "red")
 ```
 
-
-
-
-
-
-
-
-## Explanatory Data Analysis
-```{r}
-# Dimensioner
-dim(T6.19)
-```
-```{r}
-#Variabeltyper
-str(T6.19)
-```
-```{r}
-#Sammendrag
-summary(T6.19)
-```
 
 
 
