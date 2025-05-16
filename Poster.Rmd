@@ -35,6 +35,9 @@ T6.19
 
 
 ## Explanatory Data Analysis
+#SMALL SAMPLE
+
+
 ```{r}
 # Dimensioner
 dim(T6.19)
