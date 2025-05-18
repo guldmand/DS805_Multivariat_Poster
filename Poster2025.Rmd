@@ -60,6 +60,9 @@ cor(T6.19$"Snout Vent Length (cm)", T6.19$"Weight (kg)")
 
 
 
+
+
+
 ```{r}
 # Create a scatterplot with a marginal dot plot for the variables x1 and x2
 marginal.dot.plot(T6.19$"Snout Vent Length (cm)", T6.19$"Weight (kg)", xlab = expression("Snout Vent Length (cm) x"[1]), ylab = expression("Weight (kg) x"[2]))
@@ -70,7 +73,9 @@ marginal.dot.plot(T6.19$"Snout Vent Length (cm)", T6.19$"Weight (kg)", xlab = ex
 #create t6.19 nuerical withouht column gender
 T6.19_numerical <- T6.19[, 1:2]
 
-print(round(cov(T6.19_numerical) * (nrow(T6.19) - 1) / nrow(T6.19)),2)
+#print(round(cov(T6.19_numerical) * (nrow(T6.19) - 1) / nrow(T6.19)),3)
+print(round(cov(T6.19_numerical) * (nrow(T6.19) - 1) / nrow(T6.19), digits=3))
+
 ```
 
 
@@ -111,6 +116,111 @@ str(T6.19)
 #Sammendrag
 summary(T6.19)
 ```
+
+# EDA: Søjlediagram
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Tilføj et unikt ID til hver observation
+T6.19_obs <- T6.19 %>%
+  mutate(Obs = paste0("Obs", row_number()))
+
+# Gør dataen lang for Snout og Weight
+T6.19_long <- T6.19_obs %>%
+  select(Obs, Gender, `Snout Vent Length (cm)`, `Weight (kg)`) %>%
+  pivot_longer(cols = c(`Snout Vent Length (cm)`, `Weight (kg)`),
+               names_to = "Variable", values_to = "Value")
+
+# Standardiser variabelnavne lidt for pænere labels
+T6.19_long$Variable <- recode(T6.19_long$Variable,
+                              "Snout Vent Length (cm)" = "Snout Length",
+                              "Weight (kg)" = "Weight")
+
+# Plot: Hver søjle er én observation
+ggplot(T6.19_long, aes(x = Obs, y = Value, fill = Gender)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ Variable, scales = "free_y") +
+  labs(
+    title = "Snout Length og Weight for alle observationer",
+    x = "Observationer", y = "Værdi"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
+  theme_minimal() +
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, size = 6))
+  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+```
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Tilføj numerisk ID og behold som karakter for rækkefølge
+T6.19_obs <- T6.19 %>%
+  mutate(Obs = row_number())
+
+# Gør data lang
+T6.19_long <- T6.19_obs %>%
+  select(Obs, Gender, `Snout Vent Length (cm)`, `Weight (kg)`) %>%
+  pivot_longer(cols = c(`Snout Vent Length (cm)`, `Weight (kg)`),
+               names_to = "Variable", values_to = "Value")
+
+# Standardiser navne
+T6.19_long$Variable <- recode(T6.19_long$Variable,
+                              "Snout Vent Length (cm)" = "Snout Length",
+                              "Weight (kg)" = "Weight")
+
+# Gør Obs til faktor for rækkefølge
+T6.19_long$Obs <- factor(T6.19_long$Obs, levels = 1:56)
+
+# Kombiner observation og variabel til unik bar
+T6.19_long$ObsVar <- interaction(T6.19_long$Obs, T6.19_long$Variable, sep = "_")
+
+# Plot begge variabler som separate søjler i ét diagram
+ggplot(T6.19_long, aes(x = Obs, y = Value, fill = Gender)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), aes(group = Variable)) +
+  labs(
+    title = "Snout Length og Weight pr. observation",
+    x = "Observation", y = "Værdi"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
+  theme_minimal()
+
+```
+
+
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Beregn gennemsnit for hver kombination af variabel og køn
+T6.19_means <- T6.19 %>%
+  group_by(Gender) %>%
+  summarise(
+    Snout = mean(`Snout Vent Length (cm)`),
+    Weight = mean(`Weight (kg)`)
+  ) %>%
+  pivot_longer(cols = c(Snout, Weight), names_to = "Variable", values_to = "Mean")
+
+# Plot
+ggplot(T6.19_means, aes(x = Gender, y = Mean, fill = Variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Gennemsnitlig Snout Length og Weight fordelt på køn",
+    x = "Køn", y = "Gennemsnitlig værdi"
+  ) +
+  scale_fill_manual(values = c("Snout" = "#619CFF", "Weight" = "#F8766D")) +
+  theme_minimal()
+
+```
+
+
 
 
 
@@ -216,3 +326,720 @@ cat("Correlation coefficient:", cor(T6.19$"Weight (kg)", T6.19$"Snout Vent Lengt
 
 
 
+```{r}
+# Plot af data
+plot(T6.19_numerical,
+     xlim = c(0, 500),
+     ylim = c(0, 100),
+     main = "Scatterplot med stikprøvegennemsnit",
+     xlab = "Snout Vent Length (cm) x1", ylab = "Weight (kg) x2", pch = 16)
+
+grid()
+
+
+# Beregning af stikprøvegennemsnit
+x_bar <- colMeans(T6.19_numerical)
+#x_bar
+
+
+# Tilføj stikprøvegennemsnit til plot
+points(x_bar[1], x_bar[2], pch = "X", col = "red", cex = 2)
+
+# Tilføj en forklaring
+legend("topleft", 
+       legend = c("56 Observationer", "Stikprøvegennemsnit"),
+       pch = c(16, 4), 
+       col = c("black", "red"),
+       pt.lwd = c(1, 3))
+
+
+
+```
+
+```{r}
+# Vis stikprøvegennemsnittet
+cat("Stikprøvegennemsnittet er:", x_bar, "\n")
+```
+
+
+
+
+
+
+```{r}
+# Udtræk data
+Xf <- T6.19[T6.19$Gender == "Female", 1:2]
+Xm <- T6.19[T6.19$Gender == "Male", 1:2]
+n1 <- nrow(Xf); n2 <- nrow(Xm)
+xbar1 <- colMeans(Xf)
+xbar2 <- colMeans(Xm)
+diff_mean <- xbar1 - xbar2
+
+# Pooled kovariansmatrix
+S1 <- cov(Xf); S2 <- cov(Xm)
+Spooled <- ((n1 - 1)*S1 + (n2 - 1)*S2)/(n1 + n2 - 2)
+
+# Egenværdier og egenvektorer
+eig <- eigen(Spooled)
+lambda <- eig$values      # egenværdier
+vectors <- eig$vectors    # egenvektorer
+
+# Parametre for ellipse
+alpha <- 0.05
+p <- 2
+n <- (n1 * n2) / (n1 + n2)
+T2_crit <- ((n1 + n2 - 2) * p / (n1 + n2 - p - 1)) * qf(1 - alpha, p, n1 + n2 - p - 1)
+
+# Generér ellipsepunkter
+theta <- seq(0, 2*pi, length = 100)
+circle <- rbind(cos(theta), sin(theta))
+scaling <- sqrt(T2_crit / n) * sqrt(lambda)
+ellipse_points <- t(vectors %*% diag(scaling) %*% circle + diff_mean)
+
+# Plot
+plot(ellipse_points, type = "l", asp = 1, lwd = 2,
+     xlab = "Snout Vent Length (cm)", ylab = "Weight (kg)",
+     main = "Hotelling’s T² Ellipse (uden ellipse-pakke)")
+points(0, 0, pch = 4, col = "red")
+text(0, 0, "0", pos = 1, cex = 0.8)
+points(diff_mean[1], diff_mean[2], pch = 19, col = "blue")
+text(diff_mean[1], diff_mean[2], "M1 - M2", pos = 4, cex = 0.8)
+
+```
+
+
+```{r}
+# Beregn generaliseret stikprøvevarians for Spooled matrix
+Xf <- T6.19[T6.19$Gender == "Female", 1:2]
+Xm <- T6.19[T6.19$Gender == "Male", 1:2]
+n1 <- nrow(Xf); n2 <- nrow(Xm)
+S1 <- cov(Xf); S2 <- cov(Xm)
+Spooled <- ((n1 - 1)*S1 + (n2 - 1)*S2)/(n1 + n2 - 2)
+
+# Determinant = generaliseret varians
+gen_var <- det(Spooled)
+cat("Generaliseret stikprøvevarians (|S|):", round(gen_var, 2))
+
+```
+
+
+
+## Test for normalitet (før hypotesetests)
+1.1 Univariate normalitetstest (marginal):
+
+    Brug Q–Q plot for hver af de to variable (Snout Vent Length og Weight).
+
+    F.eks. som i Øvelse 5.4.B.
+
+1.2 Multivariat normalitetstest:
+
+    Brug Q–Q plot for Mahalanobis afstande mod kvantilfunktion for χ² (chi-square plot).
+
+    F.eks. baseret på procedure i bogens Kapitel 4, Ex. 4.13 og Resultat 4.7
+    
+    
+```{r}
+# Lav Q-Q plots for hver af de tre variable
+par(mfrow = c(2, 2))
+
+for (i in 1:p) {
+  qqnorm(T6.19_numerical[,i], main = colnames(T6.19_numerical)[i])
+  qqline(T6.19_numerical[,i])
+}
+
+# Beregn Mahalanobis-afstandene
+Sx <- cov(T6.19_numerical)
+D2 <- mahalanobis(T6.19_numerical, colMeans(T6.19_numerical), Sx)
+
+# Lav et chi-i-anden Q-Q plot for multivariate normalitet
+qqplot(qchisq(ppoints(n, a = 0.5), df = p), D2,
+       ylab = "Mahalanobis afstande",
+       xlab = bquote("Kvantiler af " ~ chi[.(p)]^2),
+       main = bquote("Q-Q plot af Mahalanobis" * ~ D^2 * 
+                       " vs. kvantiler af" * ~ chi[.(p)]^2))
+abline(0, 1)
+```
+    
+    
+```{r}
+library(MASS)
+library(car) # til powerTransform
+
+# Antal observationer og dimensioner
+n <- nrow(T6.19_numerical)
+p <- ncol(T6.19_numerical)
+
+# Box-Cox transformationer
+pt_result <- powerTransform(T6.19_numerical)
+lambda_vec <- pt_result$lambda
+print(lambda_vec)
+
+# Transformer hver variabel
+T6.19_transformed <- as.data.frame(
+  sapply(1:p, function(i) {
+    lambda <- lambda_vec[i]
+    x <- T6.19_numerical[, i]
+    if (lambda == 0) log(x) else (x^lambda - 1) / lambda
+  })
+)
+colnames(T6.19_transformed) <- colnames(T6.19_numerical)
+
+# Plot QQ-plots for de transformerede variable
+par(mfrow = c(2, 2))
+for (i in 1:p) {
+  qqnorm(T6.19_transformed[, i], 
+         main = paste("Q-Q plot (transformeret):", colnames(T6.19_transformed)[i]))
+  qqline(T6.19_transformed[, i])
+}
+
+# Mahalanobis-afstande (baseret på transformerede data)
+Sx <- cov(T6.19_transformed)
+D2 <- mahalanobis(T6.19_transformed, colMeans(T6.19_transformed), Sx)
+
+# Q-Q plot af Mahalanobis afstande vs. chi^2
+qqplot(qchisq(ppoints(n, a = 0.5), df = p), D2,
+       ylab = expression("Mahalanobis afstande"),
+       xlab = bquote("Kvantiler af " ~ chi[.(p)]^2),
+       main = bquote("Q-Q plot af Mahalanobis" * ~ D^2 * " (transformeret)"))
+abline(0, 1)
+ 
+```
+    
+    
+    
+
+.
+
+
+
+## 2. Univariate inferens (T-tests)
+## 2. Univariate analyser
+
+* **T-test** for:
+
+  * længde vs. køn
+  * vægt vs. køn
+  * Bruges til at supplere konklusionen fra multivariat test
+
+
+
+
+## 2.B Geometrisk forståelse af kovarians og korrelation (frivillig sektion)
+
+```{r}
+# Udvælg de første 3 observationer (uanset køn)
+X <- as.matrix(T6.19[1:3, 1:2])  # 3x2 matrix (Snout, Weight)
+
+# Beregn middelvektor (kolonnegennemsnit)
+x_bar <- colMeans(X)
+
+# Lav 1-vektor
+Ones <- rep(1, nrow(X))
+
+# Beregn afvigelsesmatrix: Y = X - 1 * x_bar^T
+Y <- X - Ones %*% t(x_bar)
+
+# Udtræk kolonnerne som vektorer
+Y1 <- Y[,1]  # Snout
+Y2 <- Y[,2]  # Weight
+
+# Beregn længder
+Ly1 <- sqrt(sum(Y1^2))
+Ly2 <- sqrt(sum(Y2^2))
+
+# Beregn cosinus og vinkel
+costh <- sum(Y1 * Y2) / (Ly1 * Ly2)
+ang <- acos(costh) * 180 / pi
+
+# Varians, kovarians og korrelation
+s11 <- sum(Y1^2) / nrow(X)
+s22 <- sum(Y2^2) / nrow(X)
+s12 <- sum(Y1 * Y2) / nrow(X)
+r12 <- s12 / sqrt(s11 * s22)
+
+# Print resultater
+cat("Afvigelsesvektorer for Anaconda-data (første 3 rækker):\n\n")
+cat("Længde af afvigelsesvektor Snout:", Ly1, "\n")
+cat("Længde af afvigelsesvektor Weight:", Ly2, "\n")
+cat("Cosinus til vinkel mellem vektorer:", costh, "\n")
+cat("Vinkel mellem vektorer (grader):", ang, "\n\n")
+cat("Varians af Snout:", s11, "\n")
+cat("Varians af Weight:", s22, "\n")
+cat("Kovarians:", s12, "\n")
+cat("Korrelationskoefficient:", r12, "\n")
+
+```
+
+```{r}
+# Udtræk de første 3 observationer (Snout og Weight)
+X <- as.matrix(T6.19[1:3, 1:2])
+x_bar <- colMeans(X)
+Ones <- rep(1, 3)
+
+# Afvigelsesmatrix: Y = X - 1 * x_bar^T
+Y <- X - Ones %*% t(x_bar)
+
+# Udtræk kolonner
+Y1 <- Y[,1]  # Snout
+Y2 <- Y[,2]  # Weight
+
+# Plot setup
+plot(NA, xlim = range(c(0, Y1)), ylim = range(c(0, Y2)),
+     xlab = "Snout deviation", ylab = "Weight deviation",
+     main = "Afvigelsesvektorer fra origo (2D)", asp = 1)
+grid()
+
+# Tegn vektorer fra origo (0,0)
+arrows(0, 0, Y1[1], Y2[1], col = "red", lwd = 2)
+arrows(0, 0, Y1[2], Y2[2], col = "blue", lwd = 2)
+arrows(0, 0, Y1[3], Y2[3], col = "darkgreen", lwd = 2)
+
+# Tilføj labels
+text(Y1[1], Y2[1], labels = "Y1", pos = 4, col = "red")
+text(Y1[2], Y2[2], labels = "Y2", pos = 4, col = "blue")
+text(Y1[3], Y2[3], labels = "Y3", pos = 4, col = "darkgreen")
+
+```
+
+
+
+
+
+
+## 3. Dekomponering af snout og vægt
+
+```{r}
+# Udtræk de første 5 observationer for hver køn
+T6.19_5females <- T6.19[T6.19$Gender == "Female", ][1:5, 1:2]
+T6.19_5males   <- T6.19[T6.19$Gender == "Male",   ][1:5, 1:2]
+
+# Kombiner i én matrix (2 rækker, 5 kolonner pr variabel)
+snout_matrix <- rbind(
+  T6.19_5males$`Snout Vent Length (cm)`,
+  T6.19_5females$`Snout Vent Length (cm)`
+)
+rownames(snout_matrix) <- c("Male", "Female")
+
+weight_matrix <- rbind(
+  T6.19_5males$`Weight (kg)`,
+  T6.19_5females$`Weight (kg)`
+)
+rownames(weight_matrix) <- c("Male", "Female")
+
+# Midler
+snout_mean <- matrix(rep(mean(snout_matrix), 10), nrow = 2, byrow = TRUE)
+rownames(snout_mean) <- c("Male", "Female")
+
+weight_mean <- matrix(rep(mean(weight_matrix), 10), nrow = 2, byrow = TRUE)
+rownames(weight_mean) <- c("Male", "Female")
+
+# Treatment effect
+snout_group_means <- matrix(c(rep(mean(snout_matrix[1, ]), 5),
+                              rep(mean(snout_matrix[2, ]), 5)),
+                            nrow = 2, byrow = TRUE)
+rownames(snout_group_means) <- c("Male", "Female")
+snout_treatment <- snout_group_means - snout_mean
+rownames(snout_treatment) <- c("Male", "Female")
+
+weight_group_means <- matrix(c(rep(mean(weight_matrix[1, ]), 5),
+                               rep(mean(weight_matrix[2, ]), 5)),
+                             nrow = 2, byrow = TRUE)
+rownames(weight_group_means) <- c("Male", "Female")
+weight_treatment <- weight_group_means - weight_mean
+rownames(weight_treatment) <- c("Male", "Female")
+
+# Residual
+snout_residual <- snout_matrix - snout_group_means
+rownames(snout_residual) <- c("Male", "Female")
+
+weight_residual <- weight_matrix - weight_group_means
+rownames(weight_residual) <- c("Male", "Female")
+
+# Vis resultat for Snout
+cat("Snout Vent Length:\n\n")
+cat("Original data:\n"); print(snout_matrix)
+cat("\nMean component:\n"); print(snout_mean)
+cat("\nTreatment effect:\n"); print(snout_treatment)
+cat("\nResidual:\n"); print(snout_residual)
+
+```
+
+```{r}
+# Vis resultat for Weight
+cat("\n\nWeight:\n\n")
+cat("Original data:\n"); print(weight_matrix)
+cat("\nMean component:\n"); print(weight_mean)
+cat("\nTreatment effect:\n"); print(weight_treatment)
+cat("\nResidual:\n"); print(weight_residual)
+
+```
+
+```{r}
+# Som plot
+
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+# ID og køn
+ID <- paste0("Obs", 1:10)
+Gender <- c(rep("Male", 5), rep("Female", 5))
+
+# Rækkefølgebevarende faktor
+ID <- factor(ID, levels = paste0("Obs", 1:10))
+
+# ----- Snout -----
+df_snout <- data.frame(
+  ID = ID,
+  Gender = Gender,
+  Mean = as.vector(snout_mean),
+  Treatment = as.vector(snout_treatment),
+  Residual = as.vector(snout_residual)
+) %>%
+  pivot_longer(cols = c("Mean", "Treatment", "Residual"),
+               names_to = "Component", values_to = "Value")
+
+# ----- Weight -----
+df_weight <- data.frame(
+  ID = ID,
+  Gender = Gender,
+  Mean = as.vector(weight_mean),
+  Treatment = as.vector(weight_treatment),
+  Residual = as.vector(weight_residual)
+) %>%
+  pivot_longer(cols = c("Mean", "Treatment", "Residual"),
+               names_to = "Component", values_to = "Value")
+
+# ----- Plot Snout -----
+ggplot(df_snout, aes(x = ID, y = Value, fill = Component)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Dekomponering af Snout (Length)") +
+  ylab("cm") +
+  theme_minimal()
+
+# ----- Plot Weight -----
+ggplot(df_weight, aes(x = ID, y = Value, fill = Component)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Dekomponering af Weight") +
+  ylab("kg") +
+  theme_minimal()
+
+```
+
+```{r}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+# ID og køn
+ID <- paste0("Obs", 1:10)
+Gender <- c(rep("Male", 5), rep("Female", 5))
+ID <- factor(ID, levels = paste0("Obs", 1:10))  # Rækkefølge
+
+# ----- Snout -----
+df_snout <- data.frame(
+  ID = ID,
+  Gender = Gender,
+  Mean = as.vector(snout_mean),
+  Treatment = as.vector(snout_treatment),
+  Residual = as.vector(snout_residual)
+) %>%
+  pivot_longer(cols = c("Mean", "Treatment", "Residual"),
+               names_to = "Component", values_to = "Value") %>%
+  mutate(Component = factor(Component, levels = c("Mean", "Treatment", "Residual")))
+
+# ----- Weight -----
+df_weight <- data.frame(
+  ID = ID,
+  Gender = Gender,
+  Mean = as.vector(weight_mean),
+  Treatment = as.vector(weight_treatment),
+  Residual = as.vector(weight_residual)
+) %>%
+  pivot_longer(cols = c("Mean", "Treatment", "Residual"),
+               names_to = "Component", values_to = "Value") %>%
+  mutate(Component = factor(Component, levels = c("Mean", "Treatment", "Residual")))
+
+# ----- Plot Snout -----
+ggplot(df_snout, aes(x = ID, y = Value, fill = Component)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(Value, 1)),
+            position = position_stack(vjust = 0.5),
+            size = 3, color = "black") +
+  scale_fill_manual(values = c("Mean" = "#F8766D", "Treatment" = "#619CFF", "Residual" = "#00BA38")) +
+  ggtitle("Dekomponering af Snout (Length)") +
+  ylab("cm") +
+  theme_minimal()
+
+# ----- Plot Weight -----
+ggplot(df_weight, aes(x = ID, y = Value, fill = Component)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(Value, 1)),
+            position = position_stack(vjust = 0.5),
+            size = 3, color = "black") +
+  scale_fill_manual(values = c("Mean" = "#F8766D", "Treatment" = "#619CFF", "Residual" = "#00BA38")) +
+  ggtitle("Dekomponering af Weight") +
+  ylab("kg") +
+  theme_minimal()
+
+```
+
+
+
+
+```{r}
+# Tilføj Gender label
+gender <- c(rep("Female", 5), rep("Male", 5))
+
+# Dataframes til snout
+df_snout <- data.frame(
+  ID = factor(paste0("Obs", 1:10), levels = paste0("Obs", 1:10)),
+  Gender = gender,
+  Mean = as.vector(snout_mean),
+  Treatment = as.vector(snout_treatment),
+  Residual = as.vector(snout_residual)
+) %>%
+  pivot_longer(cols = c("Mean", "Treatment", "Residual"),
+               names_to = "Component", values_to = "Value")
+
+# Dataframes til weight
+df_weight <- data.frame(
+  ID = factor(paste0("Obs", 1:10), levels = paste0("Obs", 1:10)),
+  Gender = gender,
+  Mean = as.vector(weight_mean),
+  Treatment = as.vector(weight_treatment),
+  Residual = as.vector(weight_residual)
+) %>%
+  pivot_longer(cols = c("Mean", "Treatment", "Residual"),
+               names_to = "Component", values_to = "Value")
+
+# ----- Plot Snout (med køn i farve) -----
+ggplot(df_snout, aes(x = ID, y = Value, fill = Component)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~Gender, scales = "free_x") +
+  ggtitle("Dekomponering af Snout (Length) opdelt efter køn") +
+  ylab("cm") +
+  theme_minimal()
+
+# ----- Plot Weight (med køn i farve) -----
+ggplot(df_weight, aes(x = ID, y = Value, fill = Component)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~Gender, scales = "free_x") +
+  ggtitle("Dekomponering af Weight opdelt efter køn") +
+  ylab("kg") +
+  theme_minimal()
+
+```
+
+```{r}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+# Tilføj Gender label
+gender <- c(rep("Female", 5), rep("Male", 5))
+ID <- factor(paste0("Obs", 1:10), levels = paste0("Obs", 1:10))
+
+# ---- SNOUT ----
+df_snout <- data.frame(
+  ID = ID,
+  Gender = gender,
+  Mean = as.vector(snout_mean),
+  Treatment = as.vector(snout_treatment),
+  Residual = as.vector(snout_residual)
+) %>%
+  pivot_longer(cols = c("Mean", "Treatment", "Residual"),
+               names_to = "Component", values_to = "Value") %>%
+  mutate(Component = factor(Component, levels = c("Mean", "Treatment", "Residual")))
+
+# ---- WEIGHT ----
+df_weight <- data.frame(
+  ID = ID,
+  Gender = gender,
+  Mean = as.vector(weight_mean),
+  Treatment = as.vector(weight_treatment),
+  Residual = as.vector(weight_residual)
+) %>%
+  pivot_longer(cols = c("Mean", "Treatment", "Residual"),
+               names_to = "Component", values_to = "Value") %>%
+  mutate(Component = factor(Component, levels = c("Mean", "Treatment", "Residual")))
+
+# ---- Farver ----
+custom_colors <- c("Mean" = "#F8766D", "Treatment" = "#619CFF", "Residual" = "#00BA38")
+
+# ---- Plot SNOUT ----
+ggplot(df_snout, aes(x = ID, y = Value, fill = Component)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(Value, 1)),
+            position = position_stack(vjust = 0.5),
+            size = 3, color = "black") +
+  facet_wrap(~Gender, scales = "free_x") +
+  scale_fill_manual(values = custom_colors) +
+  ggtitle("Dekomponering af Snout (Length) opdelt efter køn") +
+  ylab("cm") +
+  theme_minimal()
+
+# ---- Plot WEIGHT ----
+ggplot(df_weight, aes(x = ID, y = Value, fill = Component)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(Value, 1)),
+            position = position_stack(vjust = 0.5),
+            size = 3, color = "black") +
+  facet_wrap(~Gender, scales = "free_x") +
+  scale_fill_manual(values = custom_colors) +
+  ggtitle("Dekomponering af Weight opdelt efter køn") +
+  ylab("kg") +
+  theme_minimal()
+
+```
+
+
+
+## 4. Multivariat inferens
+(Hotelling’s T² test: H₀: μ_female = μ_male)
+
+
+4.1 Hotelling’s T² test
+* **Hotelling’s T² test** for forskel i middelvektor:
+
+  * $H_0: \mu_{\text{female}} = \mu_{\text{male}}$
+  * $H_A: \mu_{\text{female}} \ne \mu_{\text{male}}$
+* Hvis signifikant → fortsæt med simultane CI’er
+
+
+
+4.2 Generaliseret stikprøvevarians (|S|)
+
+# Generaliseret stikprøvevarians (|S|) for poolet kovariansmatrix
+
+### Total Spredning i Flere Dimensioner (|S|)
+### Multivariat Spredning: Determinant af Spooled
+### kovariansstruktur: Generaliseret Varians
+### Determinant af Spooled Matrix – Mål for Multivariat Spredning
+### |S| som Mål for Volumen af Dataspredning
+
+(relevant for Hotelling's T² og Mahalanobis-afstand)
+
+```{r}
+# 1. Generaliseret stikprøvevarians for pooled matrix
+Xf <- T6.19[T6.19$Gender == "Female", 1:2]
+Xm <- T6.19[T6.19$Gender == "Male", 1:2]
+n1 <- nrow(Xf); n2 <- nrow(Xm)
+S1 <- cov(Xf); S2 <- cov(Xm)
+Spooled <- ((n1 - 1)*S1 + (n2 - 1)*S2)/(n1 + n2 - 2)
+
+# Determinant = generaliseret varians
+gen_var <- det(Spooled)
+cat("Generaliseret stikprøvevarians (|S|):", round(gen_var, 4))
+
+```
+
+Fortolkning
+
+# Ekstra fortolkning til posteren:
+```{r}
+cat("\n|S| udtrykker den samlede multivariate variation og volumen i datasættet.\n",
+    "En høj værdi indikerer stor spredning i både længde og vægt.\n")
+
+```
+
+
+
+
+
+|S| udtrykker den samlede multivariate variation og volumen i datasættet. En høj værdi indikerer stor spredning i både længde og vægt.
+
+
+```{r}
+cat("Generaliseringen |S| = |D| ⋅ |R| viser, at varians og korrelation sammen bestemmer spredningens volumen.\n")
+```
+
+
+
+```{r}
+
+cat("Bemærk: Determinanten af Spooled-matrixen fungerer som en generaliseret stikprøvevarians.\n",
+    "En lav værdi tyder på høj korrelation mellem variablerne, mens en høj værdi tyder på større uafhængighed.\n")
+```
+
+|S| måler samlet spredning. Lav værdi → høj korrelation. Høj værdi → større uafhængighed.
+
+
+
+
+
+4.3 Visualisering: Hotelling’s T²-ellipse
+
+
+```{r}
+#Grafisk med ellipse pakken
+
+library(ellipse)
+
+# Brug Spooled og center i forskellen mellem køn
+Xf <- T6.19[T6.19$Gender == "Female", 1:2]
+Xm <- T6.19[T6.19$Gender == "Male", 1:2]
+xbar1 <- colMeans(Xf)
+xbar2 <- colMeans(Xm)
+diff_mean <- xbar1 - xbar2
+
+n1 <- nrow(Xf); n2 <- nrow(Xm)
+Spooled <- ((n1 - 1)*cov(Xf) + (n2 - 1)*cov(Xm))/(n1 + n2 - 2)
+n <- (n1 * n2) / (n1 + n2)
+alpha <- 0.05
+p <- 2
+T2_crit <- ((n1 + n2 - 2) * p / (n1 + n2 - p - 1)) * qf(1 - alpha, p, n1 + n2 - p - 1)
+
+# Plot
+plot(ellipse(Spooled / n, centre = diff_mean, level = 1 - alpha,
+             t = sqrt(T2_crit)), type = "l", col = "darkblue",
+     xlab = "Snout Vent Length (cm)", ylab = "Weight (kg)",
+     main = "Hotelling’s T² Ellipse (Volumen ≈ |S|)")
+points(0, 0, pch = 4, col = "red")
+text(0, 0, "0", pos = 1, cex = 0.8)
+
+```
+
+```{r}
+# Grafisk uden ellipse pakken
+# Parametre
+xbar1 <- colMeans(Xf)
+xbar2 <- colMeans(Xm)
+diff_mean <- xbar1 - xbar2
+n <- (n1 * n2) / (n1 + n2)
+alpha <- 0.05
+p <- 2
+T2_crit <- ((n1 + n2 - 2) * p / (n1 + n2 - p - 1)) * qf(1 - alpha, p, n1 + n2 - p - 1)
+
+# Generér ellipse uden ellipse-pakke
+theta <- seq(0, 2*pi, length.out = 200)
+circle <- cbind(cos(theta), sin(theta))
+A <- chol(Spooled / n * T2_crit)
+ellipse_coords <- t(diff_mean + t(circle %*% A))
+
+# Plot
+plot(ellipse_coords, type = "l", lwd = 2, col = "black",
+     xlab = "Snout Vent Length (cm)", ylab = "Weight (kg)",
+     main = "Hotelling’s T² Ellipse (uden ellipse-pakke)")
+points(0, 0, col = "blue", pch = 19)
+text(0, 0, "0", pos = 1)
+points(diff_mean[1], diff_mean[2], pch = 19, col = "darkblue")
+#text(diff_mean[1], diff_mean[2], "M1 - M2", pos = 4, col = "darkblue")
+text(diff_mean[1], diff_mean[2], expression(mu[1] - mu[2]), pos = 4, col = "darkblue")
+
+
+```
+
+🔍 Punktet "M1 - M2" repræsenterer forskellen mellem de to gruppers stikprøvegennemsnit. Hvis dette punkt falder uden for T²-ellipsen, tyder det på en signifikant forskel i middelværdierne.
+
+
+4.4 Mannova
+
+
+## 5. Box’s M test
+
+## 6. Simultane konfidensintervaller
+(Ellipse + Bonferroni CI)
+
+
+## 7. Konklusion og fortolkning
