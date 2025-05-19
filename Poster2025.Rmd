@@ -130,14 +130,16 @@ T6.19_obs <- T6.19 %>%
 
 # Gør dataen lang for Snout og Weight
 T6.19_long <- T6.19_obs %>%
-  select(Obs, Gender, `Snout Vent Length (cm)`, `Weight (kg)`) %>%
+  dplyr::select(`Obs`, `Gender`, `Snout Vent Length (cm)`, `Weight (kg)`) %>%
   pivot_longer(cols = c(`Snout Vent Length (cm)`, `Weight (kg)`),
                names_to = "Variable", values_to = "Value")
 
 # Standardiser variabelnavne lidt for pænere labels
-T6.19_long$Variable <- recode(T6.19_long$Variable,
-                              "Snout Vent Length (cm)" = "Snout Length",
-                              "Weight (kg)" = "Weight")
+library(stringr)
+
+T6.19_long$Variable <- str_replace_all(T6.19_long$Variable,
+                                       c("Snout Vent Length \\(cm\\)" = "Snout Length",
+                                         "Weight \\(kg\\)" = "Weight"))
 
 # Plot: Hver søjle er én observation
 ggplot(T6.19_long, aes(x = Obs, y = Value, fill = Gender)) +
@@ -149,14 +151,16 @@ ggplot(T6.19_long, aes(x = Obs, y = Value, fill = Gender)) +
   ) +
   scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
   theme_minimal() +
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, size = 6))
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
+
 ```
+
 ```{r}
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(stringr)
 
 # Tilføj numerisk ID og behold som karakter for rækkefølge
 T6.19_obs <- T6.19 %>%
@@ -164,19 +168,19 @@ T6.19_obs <- T6.19 %>%
 
 # Gør data lang
 T6.19_long <- T6.19_obs %>%
-  select(Obs, Gender, `Snout Vent Length (cm)`, `Weight (kg)`) %>%
+  dplyr::select(Obs, Gender, `Snout Vent Length (cm)`, `Weight (kg)`) %>%
   pivot_longer(cols = c(`Snout Vent Length (cm)`, `Weight (kg)`),
                names_to = "Variable", values_to = "Value")
 
 # Standardiser navne
-T6.19_long$Variable <- recode(T6.19_long$Variable,
-                              "Snout Vent Length (cm)" = "Snout Length",
-                              "Weight (kg)" = "Weight")
+T6.19_long$Variable <- str_replace_all(T6.19_long$Variable,
+                                       c("Snout Vent Length \\(cm\\)" = "Snout Length",
+                                         "Weight \\(kg\\)" = "Weight"))
 
 # Gør Obs til faktor for rækkefølge
 T6.19_long$Obs <- factor(T6.19_long$Obs, levels = 1:56)
 
-# Kombiner observation og variabel til unik bar
+# Kombiner observation og variabel til unik bar (bruges ikke i plot her men gemmes til evt. brug)
 T6.19_long$ObsVar <- interaction(T6.19_long$Obs, T6.19_long$Variable, sep = "_")
 
 # Plot begge variabler som separate søjler i ét diagram
@@ -517,9 +521,285 @@ abline(0, 1)
 
 * **T-test** for:
 
+```{r}
+# Univariate t-tests for Snout Vent Length og Weight mod Gender
+
+# Antag at køn er korrekt kodet som faktor med levels: Female, Male
+T6.19$Gender <- factor(T6.19$Gender, levels = c("Female", "Male"))
+
+```
+
+
   * længde vs. køn
+```{r}
+# T-test for Snout Vent Length (cm) mellem køn
+t_snout <- t.test(`Snout Vent Length (cm)` ~ Gender, data = T6.19, var.equal = TRUE)
+
+#var.equal = TRUE bruges her i tråd med forudsætningen fra tidligere øvelser, hvor vi antager lig varians ved sammenligninger af grupper.
+
+
+print(t_snout)
+```
+  ✅ Korrekt fortolkning:
+
+    H₀ (nulhypotese): Der er ingen forskel i gennemsnitlig snout length mellem han- og hun-anacondaer.
+
+    H₁ (alternativ hypotese): Der er en forskel i gennemsnitlig snout length mellem kønnene.
+
+📌 Resultat:
+
+    P-værdien er ekstremt lille (≈ 5.98e-12), dvs. langt under den typiske signifikansgrænse (α = 0.05).
+
+    Derfor forkaster vi H₀: Der er statistisk evidens for, at snout length afhænger af køn.
+
+    Konfidensintervallet [92.17, 146.88][92.17, 146.88] indeholder ikke nul, hvilket styrker denne konklusion.
+
+    Hun-anacondaer (♀) har i gennemsnit ca. 120 cm længere snout end hanner (♂).
+
+❗ Korrigeret fortolkning:
+
+    "Da p-værdien er meget lav (<< 0.05), forkastes H₀. Der er altså en statistisk signifikant forskel i snout length mellem hun- og han-anacondaer. Det tyder på, at snout length afhænger af køn."
+
+💥 OBS: Din formulering “H0 hypotesen ikke forkastes baseret på lav p-værdi” er forkert — lav p-værdi betyder netop, at vi forkaster H₀.
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   * vægt vs. køn
+```{r}
+# T-test for Weight (kg) mellem køn
+t_weight <- t.test(`Weight (kg)` ~ Gender, data = T6.19, var.equal = TRUE)
+
+#var.equal = TRUE bruges her i tråd med forudsætningen fra tidligere øvelser, hvor vi antager lig varians ved sammenligninger af grupper.
+
+
+print(t_weight)
+```
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  ✅ Korrekt fortolkning:
+
+    H₀ (nulhypotese): Der er ingen forskel i gennemsnitlig vægt mellem kønnene.
+
+    H₁ (alternativ hypotese): Der er forskel i gennemsnitlig vægt mellem kønnene.
+
+📌 Resultat:
+
+    P-værdien er ekstremt lav (≈ 1.74e-10), altså klart under 0.05 → forkast H₀.
+
+    Der er statistisk belæg for, at køn har stor betydning for vægt.
+
+    Konfidensintervallet viser, at hunner vejer 22–38 kg mere end hanner i gennemsnit.
+
+❗ Korrigeret fortolkning:
+
+    "P-værdien er meget lav, hvilket betyder, at vi forkaster H₀. Der er statistisk signifikant forskel i vægt mellem køn. Vægten afhænger af køn, og hun-anacondaer vejer gennemsnitligt betydeligt mere."
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  (Sammenfatning)
+  
+  ✅ Samlet konklusion:
+  
+  Test	p-værdi	H₀ forkastes?	Fortolkning
+  Snout Length ~ Gender	5.98e-12	Ja	Snout length afhænger af køn
+  Weight ~ Gender	1.74e-10	Ja	Vægt afhænger af køn
+    
+  
+  
+  📊 Tabel til posteren (Univariate T-tests)
+  
+  | **Variabel**      | **Middelværdi (♀)** | **Middelværdi (♂)** | **T-værdi** | **P-værdi**      | **95% CI for forskel** | **Konklusion**                        |
+  | ----------------- | ------------------- | ------------------- | ----------- | ---------------- | ---------------------- | ------------------------------------- |
+  | Snout Length (cm) | 348.28              | 228.75              | 8.76        | < 0.000000000006 | \[92.17, 146.88]       | Signifikant forskel. Afhænger af køn. |
+  | Weight (kg)       | 37.26               | 7.29                | 7.85        | < 0.000000000174 | \[22.32, 37.63]        | Signifikant forskel. Afhænger af køn. |
+
+    
+    
+ 🧾 Noter til posteren (fortolkning og forklaring):
+ 
+   Univariate T-tests blev udført for hver af de to variable:
+  
+      Snout Length (cm) og Weight (kg) fordelt på køn (♀ vs ♂).
+  
+      Begge tests viser ekstremt lave p-værdier (<< 0.05), hvilket betyder, at vi forkaster nulhypotesen.
+  
+  🟢 Fortolkning:
+  
+      Der er statistisk signifikant forskel i både længde og vægt mellem hun- og han-anacondaer.
+  
+      Hun-anacondaer har i gennemsnit 120 cm længere snout og 30 kg højere vægt end hanner.
+  
+      Disse forskelle er ikke blot statistisk signifikante, men også biologisk relevante.
+      
+      
+      
+📦 Boxplots for Snout Length og Weight fordelt på køn
+
+```{r}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+
+# Gør data lang
+T6.19_long <- T6.19 %>%
+  dplyr::select(Gender, `Snout Vent Length (cm)`, `Weight (kg)`) %>%
+  pivot_longer(cols = -Gender, names_to = "Variable", values_to = "Value")
+
+# Standardiser labels
+T6.19_long$Variable <- gsub("Snout Vent Length \\(cm\\)", "Snout Length", T6.19_long$Variable)
+T6.19_long$Variable <- gsub("Weight \\(kg\\)", "Weight", T6.19_long$Variable)
+
+# Boxplot
+ggplot(T6.19_long, aes(x = Gender, y = Value, fill = Gender)) +
+  geom_boxplot(alpha = 0.7) +
+  facet_wrap(~ Variable, scales = "free_y") +
+  labs(
+    title = "Boxplots af Snout Length og Weight fordelt på køn",
+    x = "Køn", y = "Værdi"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
+  theme_minimal()
+
+```
+
+    
+    
+    
+```{r}
+# Violinplot
+ggplot(T6.19_long, aes(x = Gender, y = Value, fill = Gender)) +
+  geom_violin(trim = FALSE, alpha = 0.6, bw = 10) +  # Juster bw (bandwidth)
+  geom_boxplot(width = 0.1, fill = "white", outlier.shape = NA) +
+  facet_wrap(~ Variable, scales = "free_y") +
+  labs(
+    title = "Violinplots af Snout Length og Weight fordelt på køn",
+    x = "Køn", y = "Værdi"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
+  theme_minimal()
+
+
+```
+    
+  
+  
+```{r}
+ggplot(T6.19_long, aes(x = Gender, y = Value, fill = Gender)) +
+  geom_violin(trim = FALSE, scale = "count", alpha = 0.6) +
+  geom_boxplot(width = 0.1, fill = "white", outlier.shape = NA) +
+  facet_wrap(~ Variable, scales = "free_y") +
+  labs(
+    title = "Violinplots af Snout Length og Weight fordelt på køn",
+    x = "Køn", y = "Værdi"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
+  theme_minimal()
+
+```
+  
+  
+```{r}
+# Violinplot: Snout Length
+ggplot(T6.19, aes(x = Gender, y = `Snout Vent Length (cm)`, fill = Gender)) +
+  geom_violin(trim = FALSE, alpha = 0.6) +
+  geom_boxplot(width = 0.1, fill = "white", outlier.shape = NA) +
+  labs(
+    title = "Violin Plot: Snout Length by Gender",
+    x = "Gender", y = "Snout Length (cm)"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
+  theme_minimal()
+
+# Violinplot: Weight
+ggplot(T6.19, aes(x = Gender, y = `Weight (kg)`, fill = Gender)) +
+  geom_violin(trim = FALSE, alpha = 0.6) +
+  geom_boxplot(width = 0.1, fill = "white", outlier.shape = NA) +
+  labs(
+    title = "Violin Plot: Weight by Gender",
+    x = "Gender", y = "Weight (kg)"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
+  theme_minimal()
+
+```
+  
+```{r}
+# Pakker
+library(ggplot2)
+library(dplyr)
+
+# Plot 1: Snout Length by Gender
+ggplot(T6.19, aes(x = Gender, y = `Snout Vent Length (cm)`, fill = Gender)) +
+  geom_violin(trim = FALSE, alpha = 0.6) +
+  geom_boxplot(width = 0.1, fill = "white", outlier.shape = NA) +
+  labs(
+    title = "Violin Plot: Snout Length by Gender",
+    x = "Gender",
+    y = "Snout Length (cm)"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
+  theme_minimal()
+
+```
+  
+  
+```{r}
+# Plot 2: Weight by Gender
+ggplot(T6.19, aes(x = Gender, y = `Weight (kg)`, fill = Gender)) +
+  geom_violin(trim = FALSE, alpha = 0.6) +
+  geom_boxplot(width = 0.1, fill = "white", outlier.shape = NA) +
+  labs(
+    title = "Violin Plot: Weight by Gender",
+    x = "Gender",
+    y = "Weight (kg)"
+  ) +
+  scale_fill_manual(values = c("Female" = "#F8766D", "Male" = "#619CFF")) +
+  theme_minimal()
+
+```
+  
+  
+  
+  
+  
   * Bruges til at supplere konklusionen fra multivariat test
+  --------------------------------------------------------------
 
 
 
@@ -907,6 +1187,49 @@ ggplot(df_weight, aes(x = ID, y = Value, fill = Component)) +
 * Hvis signifikant → fortsæt med simultane CI’er
 
 
+```{r}
+# Udtræk data for hver gruppe (kun numeriske kolonner)
+Xf <- T6.19[T6.19$Gender == "Female", 1:2]  # Snout og Weight
+Xm <- T6.19[T6.19$Gender == "Male", 1:2]
+
+# Gruppestørrelser
+n1 <- nrow(Xf)
+n2 <- nrow(Xm)
+p <- ncol(Xf)  # Antal variable
+
+# Gruppemiddelværdier
+xbar1 <- colMeans(Xf)
+xbar2 <- colMeans(Xm)
+
+# Pooled kovariansmatrix
+S1 <- cov(Xf)
+S2 <- cov(Xm)
+Spooled <- ((n1 - 1)*S1 + (n2 - 1)*S2)/(n1 + n2 - 2)
+
+# Hotelling’s T² teststørrelse
+T2 <- (n1 * n2) / (n1 + n2) * t(xbar1 - xbar2) %*% solve(Spooled) %*% (xbar1 - xbar2)
+
+# Kritisk værdi og p-værdi
+F_crit <- ((n1 + n2 - 2) * p / (n1 + n2 - p - 1)) * qf(0.95, p, n1 + n2 - p - 1)
+F_val <- ((n1 + n2 - p - 1) * T2) / ((n1 + n2 - 2) * p)
+p_val <- 1 - pf(F_val, p, n1 + n2 - p - 1)
+
+# Udskriv resultat
+cat("Hotelling’s T² test:\n")
+cat("T² =", round(T2, 4), "\n")
+cat("F =", round(F_val, 4), "\n")
+cat("p-værdi =", format.pval(p_val, digits = 5), "\n")
+
+```
+
+Hotelling’s T² test undersøger, om der er en samlet forskel i middelvektorerne for Snout Length og Weight mellem hunner og hanner.
+
+    Da p-værdien er ekstremt lav (p ≪ 0.05), forkaster vi nulhypotesen H₀: μ_female = μ_male.
+
+    Konklusion: Der er en signifikant multivariat forskel på længde og vægt mellem de to køn.
+
+
+
 
 4.2 Generaliseret stikprøvevarians (|S|)
 
@@ -1033,10 +1356,202 @@ text(diff_mean[1], diff_mean[2], expression(mu[1] - mu[2]), pos = 4, col = "dark
 🔍 Punktet "M1 - M2" repræsenterer forskellen mellem de to gruppers stikprøvegennemsnit. Hvis dette punkt falder uden for T²-ellipsen, tyder det på en signifikant forskel i middelværdierne.
 
 
-4.4 Mannova
+✅ Kort opsummering til posteren:
+
+    Den sorte ellipse repræsenterer området for ikke-signifikante differenser i middelvektorer mellem de to køn.
+
+    Da det blå punkt (μ₁ − μ₂) falder uden for ellipsen, forkastes H₀ → der er en signifikant forskel.
 
 
-## 5. Box’s M test
+
+**4.4 Mannova** (Simpel med wilks)
+```{r}
+# Multivariat variansanalyse (MANOVA)
+model_manova <- manova(cbind(`Snout Vent Length (cm)`, `Weight (kg)`) ~ Gender, data = T6.19)
+
+# Samlet test med summary
+summary(model_manova, test = "Wilks")
+
+```
+
+ Kort forklaring til posteren (valgfrit)
+
+    Der blev udført en multivariat variansanalyse (MANOVA) for at teste, om der er en samlet forskel i længde og vægt mellem hanner og hunner.
+    Wilks’ lambda-test viste en meget signifikant forskel (p < 2.2e-16), hvilket bekræfter resultaterne fra de univariate t-tests.
+    
+
+**4.4b Mannova med Bartletts korrektion**
+```{r}
+library(dplyr)
+
+# Data: responsvariabler og grupper
+Y <- T6.19[, 1:2]  # Snout & Weight
+group <- T6.19$Gender
+n1 <- sum(group == "Female")
+n2 <- sum(group == "Male")
+g <- 2
+p <- ncol(Y)
+n_total <- nrow(Y)
+
+# Fit MANOVA-model
+fit <- manova(as.matrix(Y) ~ group)
+
+# Kort metode – direkte Wilks-test
+summary(fit, test = "Wilks")
+
+# Lang metode – Udtræk SSCP-matricer
+B <- summary(fit)$SS$group
+W <- summary(fit)$SS$Residuals
+T_mat <- B + W
+
+# Frihedsgrader
+df1 <- p * (g - 1)          # for behandling
+df2 <- p * (n_total - g)    # for residualer
+
+# Wilks' lambda
+lambda <- det(W) / det(T_mat)
+
+# Chi-i-anden Bartletts korrektion (Resultat 6.8 / 6.43)
+m <- (n1 + n2 - 2) - (p + g) / 2
+chi2_stat <- -m * log(lambda)
+chi2_crit <- qchisq(0.95, df1)
+pval_chi2 <- pchisq(chi2_stat, df1, lower.tail = FALSE)
+
+# Udskriv resultater
+cat("Wilks’ lambda: ", round(lambda, 4), "\n")
+cat("Chi²-test (Bartletts korrektion):\n")
+cat("Teststatistik:", round(chi2_stat, 3), "\n")
+cat("Kritisk værdi (χ², 95%, df =", df1, "):", round(chi2_crit, 3), "\n")
+cat("p-værdi:", signif(pval_chi2, 4), "\n")
+cat("Konklusion: ", ifelse(pval_chi2 < 0.05, "Forkast H₀ – Køn påvirker mindst én af variablerne.", "Forkast ikke H₀ – Ingen forskel."), "\n")
+
+```
+
+📌 MANOVA-resultat (ud fra Bartletts korrektion)
+
+    Wilks’ λ = 0.4125
+
+    χ² = 46.05, kritisk χ² = 5.99, df = 2
+
+    p < 0.0000000001
+
+✅ Konklusion:
+Forkast H₀ — køn har signifikant indflydelse på mindst én af variablerne (Snout Length eller Weight).
+
+
+SAmlet konklusion på MANNVA:
+
+
+📌 Kort fortolkning til posteren (tekst)
+
+    MANOVA: Multivariat variansanalyse
+
+    Undersøger om middelvektorerne for Snout Length og Weight er ens mellem hunner og hanner:
+
+        H₀: μ<sub>female</sub> = μ<sub>male</sub>
+
+        H₁: μ<sub>female</sub> ≠ μ<sub>male</sub>
+
+    Resultat:
+
+        Wilks’ λ = 0.4125
+
+        F(2, 53) = 37.745, p < 0.0000000001
+
+        χ² = 46.05, kritisk χ² = 5.99, df = 2
+
+        p < 0.0000000001
+
+    ✅ Begge tests fører til samme konklusion:
+    Forkast H₀ — køn påvirker signifikant mindst én af variablerne (snout eller vægt eller begge).
+    
+    
+    
+    
+    
+
+
+## 5.  Test for kovariansmatricer (Box’s M test)
+
+
+```{r}
+# Box’s M test for lighed i kovariansmatricer
+
+# Forudsæt: T6.19 har kolonner: Snout Vent Length (cm), Weight (kg), Gender
+library(dplyr)
+
+# Del op efter køn
+Xf <- T6.19 %>%
+  filter(Gender == "Female") %>%
+  dplyr::select(`Snout Vent Length (cm)`, `Weight (kg)`)
+
+Xm <- T6.19 %>%
+  filter(Gender == "Male") %>%
+  dplyr::select(`Snout Vent Length (cm)`, `Weight (kg)`)
+
+
+n1 <- nrow(Xf)
+n2 <- nrow(Xm)
+p <- ncol(Xf)
+g <- 2
+n_total <- n1 + n2
+
+# Kovariansmatricer
+S1 <- cov(Xf)
+S2 <- cov(Xm)
+
+# Determinanter
+detS1 <- det(S1)
+detS2 <- det(S2)
+
+# Spooled
+Spooled <- ((n1 - 1) * S1 + (n2 - 1) * S2) / (n_total - g)
+detSpooled <- det(Spooled)
+
+# Box's M test statistik
+M <- (n1 - 1) * log(detSpooled / detS1) + (n2 - 1) * log(detSpooled / detS2)
+
+# Korrektionsfaktor
+u <- ((1 / (n1 - 1)) + (1 / (n2 - 1)) - (1 / (n_total - g))) *
+     (2 * p^2 + 3 * p - 1) / (6 * (p + 1) * (g - 1))
+
+C <- (1 - u) * M
+df <- p * (p + 1) * (g - 1) / 2
+pval <- pchisq(C, df, lower.tail = FALSE)
+
+# Resultat
+cat("Box’s M test:\n")
+cat("Teststatistik:", round(C, 3), "\n")
+cat("Frihedsgrader:", df, "\n")
+cat("p-værdi:", signif(pval, 4), "\n")
+cat("Konklusion: ", ifelse(pval < 0.05,
+                          "Forkast H₀ – kovariansmatricerne er forskellige.",
+                          "Forkast ikke H₀ – antag ens kovariansmatricer."), "\n")
+
+
+```
+📌 2. Fortolkning til posteren (Box’s M-test)
+
+Box’s M-test undersøger, om varians-/kovariansstrukturen er ens mellem grupperne — her: hunner og hanner.
+Hypoteser:
+
+    H₀: Kovariansmatricerne for de to køn er ens
+
+    H₁: Mindst én gruppe har en anden kovariansstruktur
+
+Resultat:
+
+    Teststatistik: 100.325
+
+    Frihedsgrader: 3
+
+    p-værdi: < 0.0000000000000000000014
+
+✅ Konklusion: Da p-værdien er langt under 0.05, forkastes H₀.
+Der er signifikant forskel i kovariansmatricerne — dvs. variabiliteten i længde og vægt varierer mellem hunner og hanner.
+
+
+
 
 ## 6. Simultane konfidensintervaller
 (Ellipse + Bonferroni CI)
