@@ -1553,8 +1553,106 @@ Der er signifikant forskel i kovariansmatricerne — dvs. variabiliteten i læng
 
 
 
+
+
+
+
 ## 6. Simultane konfidensintervaller
 (Ellipse + Bonferroni CI)
 
 
+```{r}
+library(MASS)
+
+# Del data
+Xf <- T6.19[T6.19$Gender == "Female", 1:2]
+Xm <- T6.19[T6.19$Gender == "Male", 1:2]
+
+# Parametre
+xbar1 <- colMeans(Xf)
+xbar2 <- colMeans(Xm)
+diff_mean <- xbar1 - xbar2
+n1 <- nrow(Xf); n2 <- nrow(Xm)
+p <- ncol(Xf)
+n <- (n1 * n2) / (n1 + n2)
+Spooled <- ((n1 - 1)*cov(Xf) + (n2 - 1)*cov(Xm)) / (n1 + n2 - 2)
+
+# Kritiske værdier
+alpha <- 0.05
+t_crit <- qt(1 - alpha/(2*p), df = n1 + n2 - 2)  # Bonferroni
+T2_crit <- ((n1 + n2 - 2)*p / (n1 + n2 - p - 1)) * qf(1 - alpha, p, n1 + n2 - p - 1)  # T²
+
+# Bonferroni-interval (rektangel)
+margin <- t_crit * sqrt(diag(Spooled) / n)
+rect_coords <- rbind(
+  diff_mean + c(-margin[1], -margin[2]),
+  diff_mean + c( margin[1], -margin[2]),
+  diff_mean + c( margin[1],  margin[2]),
+  diff_mean + c(-margin[1],  margin[2]),
+  diff_mean + c(-margin[1], -margin[2])
+)
+
+# T²-ellipse
+theta <- seq(0, 2*pi, length.out = 200)
+circle <- cbind(cos(theta), sin(theta))
+A <- chol(Spooled / n * T2_crit)
+ellipse_coords <- t(diff_mean + t(circle %*% A))
+
+# Plot
+plot(ellipse_coords, type = "l", col = "blue", lwd = 2,
+     xlab = "Snout Vent Length (cm)", ylab = "Weight (kg)",
+     main = "Konfidensellipse (T²) og Bonferroni-rektangel")
+lines(rect_coords, col = "red", lty = 2, lwd = 2)
+points(0, 0, pch = 4, col = "black")
+text(0, 0, "0", pos = 1)
+points(diff_mean[1], diff_mean[2], col = "blue", pch = 19)
+text(diff_mean[1], diff_mean[2], expression(mu[1] - mu[2]), pos = 4, cex = 0.8)
+legend("topright", legend = c("T²-ellipse", "Bonferroni-interval"),
+       col = c("blue", "red"), lty = c(1, 2), lwd = 2)
+
+```
+
+🧠 2. Fortolkning – til posteren
+
+📌 Konfidensellipse og -rektangel
+
+    Vi sammenligner forskellen mellem hunner og hanner ift. både længde og vægt.
+
+    To konfidensområder vises:
+
+        🔵 Ellipse (Hotelling’s T²): Multivariat konfidensområde
+
+        🔺 Rektangel (Bonferroni CI): To separate simultane konfidensintervaller
+
+    0,0-punktet repræsenterer ingen forskel mellem kønnene.
+
+    Da både ellipse og rektangel ikke indeholder 0,0 → vi har stærk evidens for forskel i mindst én variabel.
+
+
+
+
 ## 7. Konklusion og fortolkning
+
+
+📌 Diskussion og konklusioner
+
+Gennem både univariate og multivariate analyser fandt vi klare tegn på, at køn har signifikant indflydelse på både Snout Length og Weight hos anacondaerne.
+
+    T-tests viste signifikante forskelle i både længde og vægt mellem hunner og hanner (p ≪ 0.05).
+
+    Violinplots og boxplots understøttede disse resultater visuelt med tydelig adskillelse mellem kønnene.
+
+    Hotelling’s T²-test og MANOVA bekræftede, at forskellen i middelvektorer er signifikant (Wilks' λ = 0.4125, p < 0.0000000001).
+
+    Simultane konfidensintervaller (Bonferroni og T²-ellipse) viste begge, at nulpunktet (0,0) ikke ligger inde i intervallerne → dvs. vi kan med høj sikkerhed afvise, at der ikke er forskel.
+
+    Box’s M-test viste, at variansen og kovariansstrukturen ikke er ens mellem kønnene (p < 0.000000000001), hvilket understreger forskellene yderligere.
+
+🔍 Overordnet set konkluderer vi:
+
+    Der er statistisk belæg for, at køn har en signifikant effekt på både længde og vægt hos anacondaerne, og denne effekt ses både i gennemsnit, variation og kovariansstruktur.
+
+Disse resultater bør tages i betragtning i biologisk forskning, fx ved artsopdeling, vækststudier eller populationsanalyse.
+
+
+

@@ -1,0 +1,17 @@
+---
+title: "Covarinacmatrice"
+author: "Jannik Guldmand"
+date: "2025-05-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Covariancmatrice
+
+```{r}
+cov(data)
+```
+
