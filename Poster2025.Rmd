@@ -258,9 +258,13 @@ plot(T6.19_male$`Snout Vent Length (cm)`, T6.19_male$`Weight (kg)`,
 plot(T6.19$`Snout Vent Length (cm)`, T6.19$`Weight (kg)`,
      xlab = expression("Snout Vent Length (cm) x"[1]),
      ylab = expression("Weight (kg) x"[2]),
+     xlim = c(0, 500),
+     ylim = c(0, 100),
      main = "Scatterplot by Gender",
      pch = 19,
      col = ifelse(T6.19$Gender == "Female", "darkred", "darkblue"))
+
+grid()
 
 legend("topleft", legend = c("Female", "Male"),
        col = c("darkred", "darkblue"), pch = 19)
