@@ -9,11 +9,14 @@
 % Packages
 % ====================
 
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage[size=custom,width=120,height=72,scale=1.0]{beamerposter}
+\usepackage[size=a1,scale=1.0]{beamerposter}
+
 \usetheme{gemini}
+\usetheme{default}
 \usecolortheme{cam}
+\definecolor{junglegreen}{RGB}{41,171,135}
+\definecolor{darkjungle}{RGB}{0, 102, 68}
+\setbeamercolor{headline}{bg=junglegreen}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage[numbers]{natbib}
@@ -21,6 +24,9 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.14}
 \usepackage{anyfontsize}
+\usepackage{ragged2e}
+\usepackage{wasysym}
+\usepackage{marvosym}
 
 % ====================
 % Lengths
@@ -39,20 +45,21 @@
 % Title
 % ====================
 
-\title{Some fancy title: followed by some more text}
+\title{Anakondaen}
 
-\author{Alyssa P. Hacker \inst{1} \and Ben Bitdiddle \inst{2} \and Lem E. Tweakit \inst{2}}
+\author{Sabine Christoffersen \inst{} \and Jannik B. Guldmand \inst{}}
 
-\institute[shortinst]{\inst{1} Some Institute \samelineand \inst{2} Another Institute}
+\institute[shortinst]{\inst{} Data Science - DS805 Multivariat Statistik}
 
 % ====================
 % Footer (optional)
 % ====================
 
 \footercontent{
-  \href{https://www.example.com}{https://www.example.com} \hfill
-  ABC Conference 2025, New York --- XYZ-1234 \hfill
-  \href{mailto:alyssa.p.hacker@example.com}{alyssa.p.hacker@example.com}}
+  Anaconda Data, Table 6.19, s.357 i bogen Applied Multivariate Statistical Analysis \hfill
+  \hfill
+  2025
+}
 % (can be left out to remove footer)
 
 % ====================
@@ -66,17 +73,44 @@
 % ====================
 % Body
 % ====================
-
+\makeatletter
+\setbeamertemplate{block begin}{
+  \par\vskip\medskipamount
+  \begin{beamercolorbox}[colsep*=.75ex]{block title}
+    \usebeamerfont*{block title}
+    \raggedright\insertblocktitle
+  \end{beamercolorbox}
+  {\parskip0pt\par}
+  % Add horizontal rule
+  \nointerlineskip
+  \hspace*{0pt}\rule{\linewidth}{0.4pt}
+  \vskip0.5ex
+  \usebeamerfont{block body}
+  \begin{beamercolorbox}[colsep*=.75ex,vmode]{block body}
+    \ignorespaces
+}
+\makeatother
+\setbeamerfont{block body}{series=\bfseries}
 \begin{document}
 
 % Refer to https://github.com/k4rtik/uchicago-poster
 % logo: https://www.cam.ac.uk/brand-resources/about-the-logo/logo-downloads
 \addtobeamertemplate{headline}{}
 {
-    \begin{tikzpicture}[remember picture,overlay]
-      \node [anchor=north west, inner sep=3cm] at ([xshift=0.0cm,yshift=1.0cm]current page.north west)
-      {\includegraphics[height=4.5cm]{logos/cambridge-reversed-color-logo.eps}}; 
-    \end{tikzpicture}
+  \begin{tikzpicture}[remember picture,overlay]
+  
+    % SDU logo (venstre side)
+    \node[anchor=north west, xshift=1cm, yshift=-0.2cm] 
+      at (current page.north west) 
+      {\includegraphics[height=5cm]{logos/SDU.png}};
+
+	 % Snake logo (højre side)
+    \node[anchor=north east, xshift=-1cm, yshift=3.5cm] 
+      at (current page.north east) 
+      {\includegraphics[width=12cm, angle=180]{logos/snake_white.png}};
+
+
+  \end{tikzpicture}
 }
 
 \begin{frame}[t]
@@ -85,170 +119,97 @@
 
 \begin{column}{\colwidth}
 
-  \begin{block}{A block title}
+  \begin{block}{Introduktion}
+  \justifying
 
-    Some block contents, followed by a diagram, followed by a dummy paragraph.
+	\textbf{Anakondaen} (\textit{Eunectes murinus}), også kendt som
+	den grønne anakonda, er én af verdens største og
+	tungeste slanger. Den hører til kvælerslangerne
+	og lever primært i tropiske og fugtige områder i
+	Sydamerika – især i Amazonasflodens vandrige
+	lavlandsområder.
+	\vspace{0.5em}
+	
+	
+	\begin{columns}
+	
+	  % Højre kolonne: Start på teksten (første 2-3 linjer)
+  \begin{column}{0.40\textwidth}
 
+  Anakondaen er semi-akvatisk og tilbringer
+	størstedelen af sin tid i vand, hvor dens store
+	masse ikke begrænser dens bevægelighed. I vandet
+	jager den fisk, fugle, kapivarer og endda
+	kaimaner. Den dræber sit bytte ved at kvæle det
+	med sin stærke muskulatur.
+	\vspace{1em}
+
+	I dette projekt undersøger vi forskelle i længde
+	og vægt mellem hunner og hanner, baseret på data
+	fra 56 individer. Formålet er at analysere om
+	køn har en signifikant effekt på anakondaens
+	fysiske egenskaber ved brug af multivariate
+	statistiske metoder.
+
+  \end{column}
+  
+    % Venstre kolonne: Billedet
+  \begin{column}{0.55\textwidth}
     \begin{figure}
       \centering
-      \begin{tikzpicture}[scale=6]
-        \draw[step=0.25cm,color=gray] (-1,-1) grid (1,1);
-        \draw (1,0) -- (0.2,0.2) -- (0,1) -- (-0.2,0.2) -- (-1,0)
-          -- (-0.2,-0.2) -- (0,-1) -- (0.2,-0.2) -- cycle;
-      \end{tikzpicture}
-      \caption{A figure caption.}
+      \includegraphics[width=0.9\linewidth]{logos/habitat.png}
+      \vspace{1.0em}
+      
+      \textbf{\textcolor{blue}{Figur 1:}} Anakondaens habitat.
     \end{figure}
+  \end{column}
 
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ultricies
-    eget libero ac ullamcorper. Integer et euismod ante. Aenean vestibulum
-    lobortis augue, ut lobortis turpis rhoncus sed. Proin feugiat nibh a
-    lacinia dignissim. Proin scelerisque, risus eget tempor fermentum, ex
-    turpis condimentum urna, quis malesuada sapien arcu eu purus.
 
+
+  
+\end{columns}
+	
   \end{block}
 
-  \begin{block}{A block containing a list}
+\vspace{-1em}
+\begin{block}{Datasæt}
+\justifying
 
-    Nam vulputate nunc felis, non condimentum lacus porta ultrices. Nullam sed
-    sagittis metus. Etiam consectetur gravida urna quis suscipit.
+Anakonda-datasættet består af \textbf{56 observationer} og \textbf{3 variable}:
 
-    \begin{itemize}
-      \item \textbf{Mauris tempor} risus nulla, sed ornare
-      \item \textbf{Libero tincidunt} a duis congue vitae
-      \item \textbf{Dui ac pretium} morbi justo neque, ullamcorper
-    \end{itemize}
+\begin{itemize}
+  \item \textbf{\textcolor{blue}{Snude vent længde (cm)}} — længden fra snude til den bageste åbning  (numerisk)
+  \item \textbf{\textcolor{blue}{Vægt (kg)}} — anakondaens vægt i kilo (numerisk)
+  \item \textbf{\textcolor{blue}{Køn}} — køn som kategorisk variabel med værdierne \textit{Hun} og \textit{Han} (faktor)
+\end{itemize}
 
-    Eget augue porta, bibendum venenatis tortor.
-
-  \end{block}
-
-  \begin{alertblock}{A highlighted block}
-
-    This block catches your eye, so \textbf{important stuff} should probably go
-    here.
-
-    Curabitur eu libero vehicula, cursus est fringilla, luctus est. Morbi
-    consectetur mauris quam, at finibus elit auctor ac. Aliquam erat volutpat.
-    Aenean at nisl ut ex ullamcorper eleifend et eu augue. Aenean quis velit
-    tristique odio convallis ultrices a ac odio.
-
-    \begin{itemize}
-      \item \textbf{Fusce dapibus tellus} vel tellus semper finibus. In
-        consequat, nibh sed mattis luctus, augue diam fermentum lectus.
-      \item \textbf{In euismod erat metus} non ex. Vestibulum luctus augue in
-        mi condimentum, at sollicitudin lorem viverra.
-      \item \textbf{Suspendisse vulputate} mauris vel placerat consectetur.
-        Mauris semper, purus ac hendrerit molestie, elit mi dignissim odio, in
-        suscipit felis sapien vel ex.
-    \end{itemize}
-
-    Aenean tincidunt risus eros, at gravida lorem sagittis vel. Vestibulum ante
-    ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.
-
-  \end{alertblock}
-
-\end{column}
-
-\separatorcolumn
-
-\begin{column}{\colwidth}
-
-  \begin{block}{A block containing an enumerated list}
-
-    Vivamus congue volutpat elit non semper. Praesent molestie nec erat ac
-    interdum. In quis suscipit erat. \textbf{Phasellus mauris felis, molestie
-    ac pharetra quis}, tempus nec ante. Donec finibus ante vel purus mollis
-    fermentum. Sed felis mi, pharetra eget nibh a, feugiat eleifend dolor. Nam
-    mollis condimentum purus quis sodales. Nullam eu felis eu nulla eleifend
-    bibendum nec eu lorem. Vivamus felis velit, volutpat ut facilisis ac,
-    commodo in metus.
-
-    \begin{enumerate}
-      \item \textbf{Morbi mauris purus}, egestas at vehicula et, convallis
-        accumsan orci. Orci varius natoque penatibus et magnis dis parturient
-        montes, nascetur ridiculus mus.
-      \item \textbf{Cras vehicula blandit urna ut maximus}. Aliquam blandit nec
-        massa ac sollicitudin. Curabitur cursus, metus nec imperdiet bibendum,
-        velit lectus faucibus dolor, quis gravida metus mauris gravida turpis.
-      \item \textbf{Vestibulum et massa diam}. Phasellus fermentum augue non
-        nulla accumsan, non rhoncus lectus condimentum.
-    \end{enumerate}
-
-  \end{block}
-
-  \begin{block}{Fusce aliquam magna velit}
-
-    Et rutrum ex euismod vel. Pellentesque ultricies, velit in fermentum
-    vestibulum, lectus nisi pretium nibh, sit amet aliquam lectus augue vel
-    velit. Suspendisse rhoncus massa porttitor augue feugiat molestie. Sed
-    molestie ut orci nec malesuada. Sed ultricies feugiat est fringilla
-    posuere.
+Datasættet stammer fra \textit{Table 6.19} i bogen \textit{Applied Multivariate Statistical Analysis} (6. udgave) og udgør grundlaget for vores analyse. Variablerne repræsenterer nøgleegenskaber ved anakondaer og muliggør en direkte sammenligning af længde og vægt mellem kønnene.
 
 \vspace{1em}
 
-\begin{columns}
-\begin{column}{0.4\textwidth}
-\begin{center}
-      \begin{figure}
-      \begin{tikzpicture}
-        \begin{axis}[
-            scale only axis,
-            no markers,
-            domain=0:2*pi,
-            samples=100,
-            axis lines=center,
-            axis line style={-},
-            ticks=none]
-          \addplot[red] {sin(deg(x))};
-          \addplot[blue] {cos(deg(x))};
-        \end{axis}
-      \end{tikzpicture}
-      \caption{Another figure caption.}
-    \end{figure}
-   \end{center}
-\end{column}
-\begin{column}{0.6\textwidth}  %%<--- here
-\justify
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vel dapibus erat. Morbi quis leo congue, lobortis augue bibendum, malesuada neque. Duis ullamcorper quis orci sed consequat. Nam pellentesque ullamcorper tempor. Duis eget nulla blandit, vulputate orci vitae, ullamcorper ligula. Mauris a urna ac massa dignissim scelerisque sed et augue. Donec eget urna vitae neque elementum pellentesque et eget enim. Praesent a fermentum nibh. Nullam eu nibh neque. 
-\end{column}
-\end{columns}
+De to numeriske variable indgår som responser i de multivariate analyser, mens \textbf{Køn} anvendes som gruppering til at identificere kønsforskelle.
 
+	\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.80\linewidth]{plots/scatter_final5.png}
+	
+	\textbf{\textcolor{blue}{Figur 2:}} Scatterplot fordelt på køn.
+	
+	
+	\end{figure}
 
-  \end{block}
+\end{block}
 
-  \begin{block}{Nam cursus consequat egestas}
+\vspace{-2em}
+  \begin{block}{Normalitetstest}
+    \justifying
 
-    Nulla eget sem quam. Ut aliquam volutpat nisi vestibulum convallis. Nunc a
-    lectus et eros facilisis hendrerit eu non urna. Interdum et malesuada fames
-    ac ante \textit{ipsum primis} in faucibus. Etiam sit amet velit eget sem
-    euismod tristique. Praesent enim erat, porta vel mattis sed, pharetra sed
-    ipsum. Morbi commodo condimentum massa, \textit{tempus venenatis} massa
-    hendrerit quis. Maecenas sed porta est. Praesent mollis interdum lectus,
-    sit amet sollicitudin risus tincidunt non.
+    \begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.95\linewidth]{plots/qq_1final.png}
 
-    Etiam sit amet tempus lorem, aliquet condimentum velit. Donec et nibh
-    consequat, sagittis ex eget, dictum orci. Etiam quis semper ante. Ut eu
-    mauris purus. Proin nec consectetur ligula. Mauris pretium molestie
-    ullamcorper. Integer nisi neque, aliquet et odio non, sagittis porta justo.
-
-    \begin{itemize}
-      \item \textbf{Sed consequat} id ante vel efficitur. Praesent congue massa
-        sed est scelerisque, elementum mollis augue iaculis.
-        \begin{itemize}
-          \item In sed est finibus, vulputate
-            nunc gravida, pulvinar lorem. In maximus nunc dolor, sed auctor eros
-            porttitor quis.
-          \item Fusce ornare dignissim nisi. Nam sit amet risus vel lacus
-            tempor tincidunt eu a arcu.
-          \item Donec rhoncus vestibulum erat, quis aliquam leo
-            gravida egestas.
-        \end{itemize}
-      \item \textbf{Sed luctus, elit sit amet} dictum maximus, diam dolor
-        faucibus purus, sed lobortis justo erat id turpis.
-      \item \textbf{Pellentesque facilisis dolor in leo} bibendum congue.
-        Maecenas congue finibus justo, vitae eleifend urna facilisis at.
-    \end{itemize}
-
+	\end{figure}
+	
   \end{block}
 
 \end{column}
@@ -256,78 +217,190 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vel dapibus era
 \separatorcolumn
 
 \begin{column}{\colwidth}
+\justifying
 
-  \begin{exampleblock}{A highlighted block containing some math}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.75\linewidth]{plots/qq_3.png}
 
-    A different kind of highlighted block.
+	\textbf{\textcolor{blue}{Figur 3:}} Q-Q Plots 	
+\end{figure}
 
-    $$
-    \int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
-    $$
+De univariate (marginale) og det multivariate Q-Q plot indikerer, at anakonda-dataene ikke følger en normalfordeling.
+\vspace{1em}
 
-    Interdum et malesuada fames $\{1, 4, 9, \ldots\}$ ac ante ipsum primis in
-    faucibus. Cras eleifend dolor eu nulla suscipit suscipit. Sed lobortis non
-    felis id vulputate.
+Vi tester for univariat normalfordelt data, da dette er en forudsætning for at udføre univariat-inferens (T-test). Vi tester for multivariat normalitet, da dette er en forudsætning for at udføre multivariat inferens.
 
-    \heading{A heading inside a block}
+\vspace{0.5em}
 
-    Praesent consectetur mi $x^2 + y^2$ metus, nec vestibulum justo viverra
-    nec. Proin eget nulla pretium, egestas magna aliquam, mollis neque. Vivamus
-    dictum $\mathbf{u}^\intercal\mathbf{v}$ sagittis odio, vel porta erat
-    congue sed. Maecenas ut dolor quis arcu auctor porttitor.
 
-    \heading{Another heading inside a block}
+  
+\begin{block}{Univariat inferens (T-tests)}
+  \justifying
 
-    Sed augue erat, scelerisque a purus ultricies, placerat porttitor neque.
-    Donec $P(y \mid x)$ fermentum consectetur $\nabla_x P(y \mid x)$ sapien
-    sagittis egestas. Duis eget leo euismod nunc viverra imperdiet nec id
-    justo.
+ Vi har udført to uafhængige T-tests for at undersøge, om der er forskelle i \textbf{Snude vent længde (cm)} og \textbf{Vægt (kg)} mellem han- og hun-anakondaer.
+	
+I de univariate T-tests tester vi, om 
+\boldsymbol{\mu}_{\text{Hun}} = \boldsymbol{\mu}_{\text{Han}}:
 
-  \end{exampleblock}
-
-  \begin{block}{Nullam vel erat at velit convallis laoreet}
-
-    Class aptent taciti sociosqu ad litora torquent per conubia nostra, per
-    inceptos himenaeos. Phasellus libero enim, gravida sed erat sit amet,
-    scelerisque congue diam. Fusce dapibus dui ut augue pulvinar iaculis.
-
-    \begin{table}
-      \centering
-      \begin{tabular}{l r r c}
-        \toprule
-        \textbf{First column} & \textbf{Second column} & \textbf{Third column} & \textbf{Fourth} \\
-        \midrule
-        Foo & 13.37 & 384,394 & $\alpha$ \\
-        Bar & 2.17 & 1,392 & $\beta$ \\
-        Baz & 3.14 & 83,742 & $\delta$ \\
-        Qux & 7.59 & 974 & $\gamma$ \\
-        \bottomrule
-      \end{tabular}
-      \caption{A table caption.}
-    \end{table}
-
-    Donec quis posuere ligula. Nunc feugiat elit a mi malesuada consequat. Sed
-    imperdiet augue ac nibh aliquet tristique. Aenean eu tortor vulputate,
-    eleifend lorem in, dictum urna. Proin auctor ante in augue tincidunt
-    tempor. Proin pellentesque vulputate odio, ac gravida nulla posuere
-    efficitur. Aenean at velit vel dolor blandit molestie. Mauris laoreet
-    commodo quam, non luctus nibh ullamcorper in. Class aptent taciti sociosqu
-    ad litora torquent per conubia nostra, per inceptos himenaeos.
-
-    Nulla varius finibus volutpat. Mauris molestie lorem tincidunt, iaculis
-    libero at, gravida ante. Phasellus at felis eu neque suscipit suscipit.
-    Integer ullamcorper, dui nec pretium ornare, urna dolor consequat libero,
-    in feugiat elit lorem euismod lacus. Pellentesque sit amet dolor mollis,
-    auctor urna non, tempus sem.
-
-  \end{block}
-
-  \begin{block}{References}
-
-    \nocite{*}
-    \footnotesize{\bibliographystyle{plainnat}\bibliography{poster}}
+\begin{itemize}
+  \item $H_0$: Der er ingen forskel i gennemsnitlig Snude vent længde mellem kønnene.
+  \item $H_1$: Der er forskel i gennemsnitlig Snude vent længde mellem kønnene.
+  
+  \vspace{0.5em}
+  
+  \item $H_0$: Der er ingen forskel i gennemsnitlig vægt mellem kønnene.
+  \item $H_1$: Der er forskel i gennemsnitlig vægt mellem kønnene.
+\end{itemize}
+\vspace{1em}
+	
+	\vspace{-1em}
+	
+  \begin{table}
+    \centering
+    \begin{tabular}{l r r r r l}
+      \toprule
+      \textbf{Variabel} & \mu\textbf{Hun} & \mu\textbf{Han} & \textbf{T-værdi} & \textbf{P-værdi} & \textbf{95\% CI} \\
+      \midrule
+      Snude vent længde (cm) & 348.28 & 228.75 & 8.76 & $< 5.98\cdot10^{-12}$ & [92.17, 146.88] \\
+      Vægt (kg)       & 37.26  & 7.29   & 7.85 & $< 1.74\cdot10^{-10}$ & [22.32, 37.63] \\
+      \bottomrule
+    \end{tabular}
+    
+      \vspace{1em}
+	\textbf{\textcolor{blue}{Tabel 1:}} Resultater fra uafhængige T-tests for længde og vægt mellem kønnene.
+    
+    
+    
+            
+  \end{table}
+  
+   \vspace{1em}
+  
+   Begge tests viser ekstremt lave p-værdier ($p \ll 0.05$), hvilket betyder, at vi forkaster nulhypotesen og konkluderer, at \textbf{både længde og vægt afhænger af køn}.
+  Hun-anakondaer er i gennemsnit ca. \textbf{120 cm længere} og \textbf{30 kg tungere} end hanner – en forskel, der både er statistisk signifikant og biologisk relevant.
 
   \end{block}
+  
+  	\begin{block}{Multivariat inferens}
+\justifying
+
+Her tester vi Hotelling’s $T^2$-test:
+\[
+H_0: \boldsymbol{\mu}_{\text{Hun}} = \boldsymbol{\mu}_{\text{Han}} 
+\quad \text{mod} \quad 
+H_A: \boldsymbol{\mu}_{\text{Hun}} \ne \boldsymbol{\mu}_{\text{Han}}
+\]
+
+Denne test undersøger, om der er en samlet forskel i middelvektorerne for \textbf{Snude vent længde} og \textbf{Vægt} mellem hunner og hanner.
+
+\begin{center}
+\begin{tabular}{lccc}
+\textbf{Resultat:} & $T^2$ & $F$ & \textit{p}-værdi \\
+\midrule
+& 76.9153 & 37.7455 & $6.4296 \cdot 10^{-11}$ \\
+\end{tabular}
+\end{center}
+
+  Da p-værdien er ekstremt lav ($p \ll 0.05$), forkaster vi nulhypotesen 
+  $H_0: \boldsymbol{\mu}_{\text{Hun}} = \boldsymbol{\mu}_{\text{Han}}$.
+
+\end{block}
+
+\begin{block}{MANOVA}
+\justifying
+Vi anvendte en multivariat variansanalyse (MANOVA) til at teste for samlede kønsforskelle i længde og vægt.
+
+\textbf{Wilks’ lambda:} $0.4125$ \quad
+\textbf{F(2, 53):} $37.75$ \quad
+\textbf{p-værdi:} $6.43 \cdot 10^{-11}$
+
+\vspace{0.5em}
+Resultatet er signifikant ($p \ll 0.05$) og understøtter tidligere analyser: længde og vægt afhænger stærkt af køn. MANOVA med Bartletts korrektion giver samme resultat.
+\end{block}
+
+  
+
+\end{column}
+
+\separatorcolumn
+
+\begin{column}{\colwidth}
+
+\begin{block}{Test for kovariansmatricer (Box’s M-test)}
+\justifying
+
+Box’s M-test vurderer, om kovariansmatricerne er ens mellem grupperne:
+\vspace{-0.75em}
+\[
+H_0: \boldsymbol{\Sigma}_{\text{Hun}} = \boldsymbol{\Sigma}_{\text{Han}} 
+\quad \text{mod} \quad 
+H_A: \boldsymbol{\Sigma}_{\text{Hun}} \ne \boldsymbol{\Sigma}_{\text{Han}}
+\]
+
+\begin{center}
+\begin{tabular}{lccc}
+\textbf{Resultat:} & $\chi^2$ & df & \textit{p}-værdi \\
+\midrule
+& 100.325 & 3 & $1.323 \cdot 10^{-21}$ \\
+\end{tabular}
+\end{center}
+
+\vspace{-0.5em}
+Da p-værdien er ekstremt lav ($p \ll 0.05$), forkaster vi nulhypotesen. 
+Der er signifikant forskel i kovariansstrukturen mellem kønnene.
+\end{block}
+
+\vspace{-1.0em}  
+\begin{block}{Simultane konfidensintervaller}
+  \justifying
+	\vspace{-0.5em}  
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[height=0.5\linewidth]{plots/simultan6.png}
+  		
+		\textbf{\textcolor{blue}{Figur 4:}} Simultane konfidensintervaller
+		
+	\end{figure}
+
+\begin{center}
+Snude vent længde (cm): \textcolor{blue}{[84.8 ; 154.2]}, \textcolor{red}{[88.1 ; 151.0]} \quad
+Vægt (kg): \textcolor{blue}{[20.3 ; 39.7]}, \textcolor{red}{[21.2 ; 38.8]}
+\end{center}
+
+
+
+  \end{block}
+  
+  
+  
+
+  \vspace{-1em}   
+  \begin{block}{Antagelser og resultater}
+  \justifying
+
+Resultaterne fra univariat- og multivariat- inferens kræver, at man kritisk forholder sig til de underliggende antagelser. Univariat T-test bygger på antagelsen om marginal normalfordeling, imens Hotellings T2-test teoretisk forudsætter, at data følger en multivariat normalfordeling. Manova og Box’s M-test antager, at grupperne har ens kovariansstrukturer. Normalitetsantagelsen er central, særligt i tolkningen af p-værdier fra tests som Box’s M, hvor teststørrelsen følger en chi-i-anden-fordeling under antagelse af normalitet. I vores analyser indikerer Q-Q plots dog, at denne antagelse ikke er opfyldt – hverken univariat eller multivariat. Derfor bør resultaterne tolkes med forsigtighed, da brud på disse forudsætninger kan påvirke testenes gyldighed og pålidelighed.
+
+\end{block}
+  
+
+
+\vspace{-1em} 
+\begin{block}{Konklusion}
+  \justifying
+	
+Der er signifikant forskel i både længde og vægt mellem han- og hun-anakondaer. De univariate og multivariate hypotesetest forkaster klart nulhypotesen om ens middelværdier. Hun-anakondaer er typisk både længere og tungere end hanner – et fænomen kendt som omvendt kønsdimorfisme, hvor hunnen er størst. Denne forskel spiller en vigtig rolle under parringsritualer, hvor flere hanner samles omkring en stor hun. I de simultane konfidensintervaller ligger punktet (0, 0) tydeligt udenfor, hvilket bekræfter forskellen mellem kønnene.
+
+\end{block}
+
+
+  	\vspace{-1em} 
+  	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=1\linewidth]{plots/snake.png}
+  		
+		\textbf{\textcolor{blue}{Figur 5:}} Illustration af anakondaens størrelser.
+	\end{figure}
 
 \end{column}
 
