@@ -1,5 +1,5 @@
 # DS805_Multivariat_Poster
-<a href="https://odin.sdu.dk/sitecore/index.php?a=fagbesk&id=176054&lang=en&listid=">Multivariate Statistical Analysis</a> Poster Project by  <a href="https://github.com/Sabichris">Sabine Christoffersen</a> & <a href="https://github.com/guldmand/">Jannik Busse Guldmand</a> <br>
+<a href="https://odin.sdu.dk/sitecore/index.php?a=fagbesk&id=176054&lang=en&listid=">Multivariate Statistical Analysis</a> poster project by  <a href="https://github.com/Sabichris">Sabine Christoffersen</a> & <a href="https://github.com/guldmand/">Jannik Busse Guldmand</a> <br>
 
 ###  R Anaconda data processing:
 - <a href="Poster2025.Rmd">Poster2025.Rmd</a>
