@@ -3,8 +3,8 @@ Multivariat Statistisk Analyse Poster Project by  <a href="https://github.com/Sa
 
 ###  R Anaconda data processing:
 - <a href="Poster2025.Rmd">Poster2025.Rmd</a>
-- Poster2025.html
+- <a href="Poster2025.html">Poster2025.html</a>
 
 ### Anaconda Latex Poster (using <a href="https://github.com/andiac/gemini-cam">gemini-cam</a> )
-- /gemini-cam/Anakonda-posster.tex
-- /gemini-cam/Anakonda-posster.pdf
+- <a href="/gemini-cam/Anakonda-posster.tex">/gemini-cam/Anakonda-posster.tex</a>
+- <a href="/gemini-cam/Anakonda-posster.pdf">/gemini-cam/Anakonda-posster.pdf</a>
