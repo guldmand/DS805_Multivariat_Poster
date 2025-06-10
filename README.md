@@ -1,6 +1,5 @@
 # DS805_Multivariat_Poster
-Multivariat Statistisk Analyse Poster Project <br>
-Created by  <a href="https://github.com/Sabichris">Sabine Christoffersen</a> & <a href="https://github.com/guldmand/">Jannik Busse Guldmand</a>
+Multivariat Statistisk Analyse Poster Project by  <a href="https://github.com/Sabichris">Sabine Christoffersen</a> & <a href="https://github.com/guldmand/">Jannik Busse Guldmand</a> <br>
 
 ###  R Anaconda data processing:
 - Poster2025.Rmd
