@@ -6,5 +6,5 @@ Multivariat Statistisk Analyse Poster Project by  <a href="https://github.com/Sa
 - <a href="Poster2025.html">Poster2025.html</a>
 
 ### Anaconda Latex Poster (using <a href="https://github.com/andiac/gemini-cam">gemini-cam</a> )
-- <a href="/gemini-anaconda-poster/Anakonda-poster.tex">/gemini-cam/Anakonda-posster.tex</a>
-- <a href="/gemini-anaconda-poster/Anakonda-poster.pdf">/gemini-cam/Anakonda-posster.pdf</a>
+- <a href="/gemini-anaconda-poster/Anakonda-poster.tex">/gemini-cam/Anakonda-poster.tex</a>
+- <a href="/gemini-anaconda-poster/Anakonda-poster.pdf">/gemini-cam/Anakonda-poster.pdf</a>
