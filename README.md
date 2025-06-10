@@ -1,13 +1,11 @@
 # DS805_Multivariat_Poster
 Multivariat Statistisk Analyse Poster Project <br>
-By Sabine Christoffersen & Jannik Busse Guldmand <br>
+Created by  <a href="https://github.com/Sabichris">Sabine Christoffersen</a> & <a href="https://github.com/guldmand/">Jannik Busse Guldmand</a>
 
- <br>
-### R Anaconda data processing:
+###  R Anaconda data processing:
 - Poster2025.Rmd
 - Poster2025.html
 
- <br>
-### Latex Anaconda Poster
+### Anaconda Latex Poster (using <a href="https://github.com/andiac/gemini-cam">gemini-cam</a> )
 - /gemini-cam/Anakonda-posster.tex
 - /gemini-cam/Anakonda-posster.pdf
